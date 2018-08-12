@@ -1,6 +1,8 @@
 import json
+import io, sys
 import discord
 from voice import knockApi
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 with open('token.json') as f:
     df = json.load(f)

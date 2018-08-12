@@ -1,13 +1,15 @@
 # ソースはこちらから引用 https://blog.leko.jp/post/voiceloid-like-text2speech/
 import json
 import os
+import io
 import sys
 import datetime
 import argparse
 import subprocess
 import requests
 import pprint
- 
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
  
 # config
 # ===========================================
