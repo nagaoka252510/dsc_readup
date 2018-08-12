@@ -5,7 +5,7 @@ from voice import knockApi
 
 with open('token.json') as f:
     df = json.load(f)
-group = input("input group:".encode("utf_8"))
+group = input("input group:")
 token = df[group]
 
 client = discord.Client()
@@ -21,7 +21,7 @@ help_msg="""[?summon]: ボイスチャンネルへ呼び出し \n
 
 @client.event
 async def on_ready():
-    print('ログインしました')
+    print('ログインしました'.encode("utf_8"))
 
 
 @client.event
