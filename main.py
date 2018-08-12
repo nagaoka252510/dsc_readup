@@ -12,16 +12,16 @@ client = discord.Client()
 voice = {}
 channel = {}
 msger = {}
-help_msg="""[?summon]: ボイスチャンネルへ呼び出し \n
-[?bye]:ボイスチャンネルからさよなら \n
-[?yukari]:声がゆかりさんになります \n
-[?maki]:声がマキさんになります \n
-[?help]:いまさっき叩いたでしょうが!!! \n
+help_msg="""[?summon]: Call to the voice channel \n
+[?bye]:Remove from the voice channel \n
+[?yukari]:Change voice to Yukari \n
+[?maki]:Change voice to Maki \n
+[?help]:This \n
 """
 
 @client.event
 async def on_ready():
-    print('ログインしました'.encode("utf_8"))
+    print('login done!')
 
 
 @client.event
