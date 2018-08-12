@@ -17,11 +17,11 @@ help_msg="""[?summon]: ボイスチャンネルへ呼び出し \n
 [?yukari]:声がゆかりさんになります \n
 [?maki]:声がマキさんになります \n
 [?help]:いまさっき叩いたでしょうが!!! \n
-""".encode("utf_8")
+""".decode("utf_8")
 
 @client.event
 async def on_ready():
-    print('ログインしました'.encode("utf_8"))
+    print('ログインしました'.decode("utf_8"))
 
 
 @client.event
