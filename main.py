@@ -1,12 +1,11 @@
 import json
-import io, sys
 import discord
 from voice import knockApi
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
 
 with open('token.json') as f:
     df = json.load(f)
-group = input("input group:")
+group = input("input group:".encode("utf_8"))
 token = df[group]
 
 client = discord.Client()
@@ -18,11 +17,11 @@ help_msg="""[?summon]: ボイスチャンネルへ呼び出し \n
 [?yukari]:声がゆかりさんになります \n
 [?maki]:声がマキさんになります \n
 [?help]:いまさっき叩いたでしょうが!!! \n
-"""
+""".encode("utf_8")
 
 @client.event
 async def on_ready():
-    print('ログインしました')
+    print('ログインしました'.encode("utf_8"))
 
 
 @client.event
