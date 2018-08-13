@@ -19,8 +19,27 @@ help_msg="""[?summon]: Call to the voice channel \n
 [?help]:This \n
 """
 
-class summon():
+class Summon():
     pass
+
+class Bye():
+    pass
+
+class Help():
+    pass
+
+class Yukari():
+    pass
+
+class Maki():
+    pass
+
+exec_comm={
+    "?summon": Summon(),
+    "?bye": Bye(),
+    "?yukari": Yukari(),
+    "?maki": Maki()
+}
 
 @client.event
 async def on_ready():
@@ -43,7 +62,12 @@ async def on_message(message):
             return
 
     if message.channel.id == channel[server_id]: #指定したチャンネルでの発言の時
-
+        if message.content.startswith("?"):
+            try:
+                exec_comm[message.content].say()
+                return
+            except:
+                await client.send_message(message.channel, "Can not exec command {}".format(message.content))
         if message.content == "?bye":
             await voice[server_id].disconnect()
             del voice[server_id]
