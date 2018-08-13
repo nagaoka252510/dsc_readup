@@ -19,6 +19,9 @@ help_msg="""[?summon]: Call to the voice channel \n
 [?help]:This \n
 """
 
+class summon():
+    pass
+
 @client.event
 async def on_ready():
     print('login done!')
@@ -40,6 +43,7 @@ async def on_message(message):
             return
 
     if message.channel.id == channel[server_id]: #指定したチャンネルでの発言の時
+
         if message.content == "?bye":
             await voice[server_id].disconnect()
             del voice[server_id]
