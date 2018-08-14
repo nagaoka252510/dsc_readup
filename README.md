@@ -3,3 +3,4 @@
 - opus
 - libffi
 - ffmpeg
+- sox
