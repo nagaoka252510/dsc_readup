@@ -16,6 +16,7 @@ help_msg="""[?summon]: Call to the voice channel \n
 [?bye]:Remove from the voice channel \n
 [?yukari]:Change voice to Yukari \n
 [?maki]:Change voice to Maki \n
+[?kou]:Change voice to Kou \n
 [?help]:This \n
 """
 
@@ -53,6 +54,9 @@ async def on_message(message):
             return
         if message.content == "?maki":
             msger[server_id] = "maki"
+            return
+        if message.content == "?kou":
+            msger[server_id] = "osamu"
             return
         
         knockApi(message.content, msger[server_id], group)
