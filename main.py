@@ -1,3 +1,4 @@
+import sys
 import json
 import discord
 from voice import knockApi
@@ -5,7 +6,10 @@ from voice import knockApi
 
 with open('token.json') as f:
     df = json.load(f)
-group = input("input group:")
+args = sys.argv
+if len(args) <  2:
+    exit(1)
+group = args[1]
 token = df[group]
 
 client = discord.Client()
