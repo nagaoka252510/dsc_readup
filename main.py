@@ -1,3 +1,4 @@
+import sys
 import json
 from time import sleep
 import discord
@@ -8,7 +9,10 @@ from voice import knockApi
 
 with open('token.json') as f:
     df = json.load(f)
-group = input("input group:")
+args = sys.argv
+if len(args) <  2:
+    exit(1)
+group = args[1]
 token = df[group]
 
 bot = commands.Bot(command_prefix='?')
