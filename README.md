@@ -2,5 +2,5 @@
 
 - opus
 - libffi
-- ffmpeg
+- ffmpeg --with-opus
 - sox
