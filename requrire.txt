@@ -1,0 +1,3 @@
+discord
+pynacl
+pydub

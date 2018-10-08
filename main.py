@@ -1,6 +1,9 @@
 import sys
 import json
+from time import sleep
 import discord
+from discord.ext import commands
+from pydub import AudioSegment
 from voice import knockApi
 
 
@@ -12,62 +15,100 @@ if len(args) <  2:
 group = args[1]
 token = df[group]
 
+bot = commands.Bot(command_prefix='?')
+
 client = discord.Client()
 voice = {}
 channel = {}
 msger = {}
-help_msg="""[?summon]: Call to the voice channel \n
-[?bye]:Remove from the voice channel \n
-[?yukari]:Change voice to Yukari \n
-[?maki]:Change voice to Maki \n
-[?kou]:Change voice to Kou \n
-[?help]:This \n
-"""
+guild_id = 0
 
-@client.event
+@bot.event
 async def on_ready():
-    print('login done!')
+    print('Logged in as')
+    print(bot.user.name)
+    print(bot.user.id)
+    print('------')
 
+bot.remove_command('help')
 
-@client.event
+@bot.command()
+async def help(ctx):
+    embed = discord.Embed(title='喋太郎', description='I read aloud messages.')
+    embed.add_field(name='?summon', value='Call me to the voice channel.', inline=False)
+    embed.add_field(name='?bye', value='Remove me to the voice channel.', inline=False)
+    embed.add_field(name='?yukari', value='Change voice to Yukari.', inline=False)
+    embed.add_field(name='?maki', value='Change voice to Maki.', inline=False)
+    embed.add_field(name='?kou', value='Change voice to Kou.', inline=False)
+
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def summon(ctx):
+    global voice
+    global channel
+    global msger
+    global guild_id
+    guild_id = ctx.guild.id
+    if guild_id not in voice:
+        voice[guild_id] = await ctx.author.voice.channel.connect()
+        channel[guild_id] = ctx.channel.id
+        msger[guild_id] = "sumire"
+        await ctx.channel.send('Hello! I\'m 喋太郎!')
+            
+@bot.command()
+async def bye(ctx):
+    global guild_id
+    global voice
+    global channel
+
+    if ctx.channel.id == channel[guild_id]:
+        await ctx.channel.send('Good Bye!')
+        await voice[guild_id].disconnect()
+        del voice[guild_id]
+        del channel[guild_id]
+        guild_id = 0
+
+@bot.command()
+async def yukari(ctx):
+    global msger
+    global guild_id
+    if ctx.channel.id == channel[guild_id]:
+        msger[guild_id] = "sumire"
+
+@bot.command()
+async def maki(ctx):
+    global msger
+    global guild_id
+    if ctx.channel.id == channel[guild_id]:
+        msger[guild_id] = "maki"
+
+@bot.command()
+async def kou(ctx):
+    global msger
+    global guild_id
+    if ctx.channel.id == channel[guild_id]:
+        msger[guild_id] = "osamu"
+
+@bot.event
 async def on_message(message):
     if message.author.bot:
         return
     global voice
     global channel
     global msger
-    server_id = message.server.id
-    if message.content == "?summon":
-            if server_id not in voice:
-                voice[server_id] = await client.join_voice_channel(message.author.voice_channel)
-                channel[server_id] = message.channel.id
-                msger[server_id] = "sumire"
-            return
+    global guild_id
+    if guild_id == 0 or message.content.startswith("?"):
+        await bot.process_commands(message)
+        return
 
-    if message.channel.id == channel[server_id]: #指定したチャンネルでの発言の時
-        if message.content == "?bye":
-            await voice[server_id].disconnect()
-            del voice[server_id]
-            del channel[server_id]
-            return
-        if message.content == "?help":
-            await client.send_message(message.channel, help_msg)
-            return
-        if message.content == "?yukari":
-            msger[server_id] = "sumire"
-            return
-        if message.content == "?maki":
-            msger[server_id] = "maki"
-            return
-        if message.content == "?kou":
-            msger[server_id] = "osamu"
-            return
-        
-        knockApi(message.content, msger[server_id], group)
-        player = voice[server_id].create_ffmpeg_player('./sound/{}/msg.wav'.format(group))
-        try:
-            player.start()
-        except:
-            pass
+    if message.channel.id == channel[guild_id]:
+        knockApi(message.content, msger[guild_id], group)
+        voice_mess = './sound/{}/msg.wav'.format(group)
+        mess_time = AudioSegment.from_file(voice_mess, "wav").duration_seconds
+        voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess), after=lambda e: print('done', e))
+        sleep(mess_time)
+    
+    await bot.process_commands(message)
 
-client.run(token)
+bot.run(token)
