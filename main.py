@@ -96,7 +96,7 @@ async def ai(ctx):
     global msger
     global guild_id
     if ctx.channel.id == channel[guild_id]:
-        msger[guild_id] = "reina"
+        msger[guild_id] = "anzu"
 
 
 @bot.event
