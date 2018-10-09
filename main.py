@@ -40,6 +40,7 @@ async def help(ctx):
     embed.add_field(name='?yukari', value='Change voice to Yukari.', inline=False)
     embed.add_field(name='?maki', value='Change voice to Maki.', inline=False)
     embed.add_field(name='?kou', value='Change voice to Kou.', inline=False)
+    embed.add_field(name='?ai', value='Change voice to Ai.', inline=False)
 
     await ctx.send(embed=embed)
 
@@ -89,6 +90,14 @@ async def kou(ctx):
     global guild_id
     if ctx.channel.id == channel[guild_id]:
         msger[guild_id] = "osamu"
+
+@bot.command()
+async def ai(ctx):
+    global msger
+    global guild_id
+    if ctx.channel.id == channel[guild_id]:
+        msger[guild_id] = "reina"
+
 
 @bot.event
 async def on_message(message):
