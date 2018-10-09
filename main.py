@@ -36,7 +36,7 @@ bot.remove_command('help')
 async def help(ctx):
     embed = discord.Embed(title='喋太郎', description='I read aloud messages.')
     embed.add_field(name='?summon', value='Call me to the voice channel.', inline=False)
-    embed.add_field(name='?bye', value='Remove me to the voice channel.', inline=False)
+    embed.add_field(name='?bye', value='Remove me from the voice channel.', inline=False)
     embed.add_field(name='?yukari', value='Change voice to Yukari.', inline=False)
     embed.add_field(name='?maki', value='Change voice to Maki.', inline=False)
     embed.add_field(name='?kou', value='Change voice to Kou.', inline=False)
@@ -75,28 +75,28 @@ async def yukari(ctx):
     global msger
     global guild_id
     if ctx.channel.id == channel[guild_id]:
-        msger[guild_id] = "sumire"
+        msger[ctx.author.id] = "sumire"
 
 @bot.command()
 async def maki(ctx):
     global msger
     global guild_id
     if ctx.channel.id == channel[guild_id]:
-        msger[guild_id] = "maki"
+        msger[ctx.author.id] = "maki"
 
 @bot.command()
 async def kou(ctx):
     global msger
     global guild_id
     if ctx.channel.id == channel[guild_id]:
-        msger[guild_id] = "osamu"
+        msger[ctx.author.id] = "osamu"
 
 @bot.command()
 async def ai(ctx):
     global msger
     global guild_id
     if ctx.channel.id == channel[guild_id]:
-        msger[guild_id] = "anzu"
+        msger[ctx.author.id] = "anzu"
 
 
 @bot.event
@@ -107,12 +107,16 @@ async def on_message(message):
     global channel
     global msger
     global guild_id
+
+    mess_id = message.author.id
+    if mess_id not in msger:
+        msger[mess_id] = 'sumire'
     if guild_id == 0 or message.content.startswith("?"):
         await bot.process_commands(message)
         return
 
     if message.channel.id == channel[guild_id]:
-        knockApi(message.content, msger[guild_id], group)
+        knockApi(message.content, msger[mess_id], group)
         voice_mess = './sound/{}/msg.wav'.format(group)
         mess_time = AudioSegment.from_file(voice_mess, "wav").duration_seconds
         voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess), after=lambda e: print('done', e))
