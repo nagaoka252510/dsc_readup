@@ -17,7 +17,6 @@ bot = commands.Bot(command_prefix='?')
 voice = {}
 channel = {}
 msger = {}
-# guild_id = 0
 
 @bot.event
 async def on_ready():
@@ -117,7 +116,11 @@ async def on_message(message):
 
     str_guild_id = str(guild_id)
     if message.channel.id == channel[guild_id]:
-        knockApi(message.content, msger[mess_id], str_guild_id)
+        try :
+            knockApi(message.content, msger[mess_id], str_guild_id)
+        except :
+            await message.channel.send('ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。')
+            return 
         voice_mess = './sound/{}/msg.wav'.format(str_guild_id)
         mess_time = AudioSegment.from_file(voice_mess, "wav").duration_seconds
         voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess), after=lambda e: print('done', e))
