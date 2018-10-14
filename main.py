@@ -119,7 +119,7 @@ async def on_message(message):
         try :
             knockApi(message.content, msger[mess_id], str_guild_id)
         except :
-            await message.channel.send('ちょいとエラー起きたみたいや。少し待ってくれな。')
+            await message.channel.send('ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。')
             return 
         voice_mess = './sound/{}/msg.wav'.format(str_guild_id)
         mess_time = AudioSegment.from_file(voice_mess, "wav").duration_seconds
