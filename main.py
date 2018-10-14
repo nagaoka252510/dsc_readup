@@ -75,28 +75,28 @@ async def yukari(ctx):
     global msger
     guild_id = ctx.guild.id
     if ctx.channel.id == channel[guild_id]:
-        msger[guild_id] = "sumire"
+        msger[ctx.author.id] = "sumire"
 
 @bot.command()
 async def maki(ctx):
     global msger
     guild_id = ctx.guild.id
     if ctx.channel.id == channel[guild_id]:
-        msger[guild_id] = "maki"
+        msger[ctx.author.id] = "maki"
 
 @bot.command()
 async def kou(ctx):
     global msger
     guild_id = ctx.guild.id
     if ctx.channel.id == channel[guild_id]:
-        msger[guild_id] = "osamu"
+        msger[ctx.author.id] = "osamu"
 
 @bot.command()
 async def ai(ctx):
     global msger
     guild_id = ctx.guild.id
     if ctx.channel.id == channel[guild_id]:
-        msger[guild_id] = "anzu"
+        msger[ctx.author.id] = "anzu"
 
 
 @bot.event
@@ -106,14 +106,18 @@ async def on_message(message):
     global voice
     global channel
     global msger
+    mess_id = message.author.id
     guild_id = message.guild.id
+
+    if mess_id not in msger:
+        msger[mess_id] = 'sumire'
     if guild_id not in channel or message.content.startswith("?"):
         await bot.process_commands(message)
         return
 
     str_guild_id = str(guild_id)
     if message.channel.id == channel[guild_id]:
-        knockApi(message.content, msger[guild_id], str_guild_id)
+        knockApi(message.content, msger[mess_id], str_guild_id)
         voice_mess = './sound/{}/msg.wav'.format(str_guild_id)
         mess_time = AudioSegment.from_file(voice_mess, "wav").duration_seconds
         voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess), after=lambda e: print('done', e))
