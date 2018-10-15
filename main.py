@@ -1,6 +1,6 @@
 import sys
 import json
-from time import sleep
+from time import sleep, time
 import discord
 from discord.ext import commands
 from pydub import AudioSegment
@@ -17,6 +17,8 @@ bot = commands.Bot(command_prefix='?')
 voice = {}
 channel = {}
 msger = {}
+mess_time = {}
+mess_start = {}
 
 @bot.event
 async def on_ready():
@@ -105,6 +107,8 @@ async def on_message(message):
     global voice
     global channel
     global msger
+    global mess_time
+    global mess_start
     mess_id = message.author.id
     guild_id = message.guild.id
 
@@ -116,15 +120,18 @@ async def on_message(message):
 
     str_guild_id = str(guild_id)
     if message.channel.id == channel[guild_id]:
+        if voice[guild_id].is_playing() :
+            sleep_time = time() - mess_start[guild_id]
+            sleep(mess_time[guild_id]-sleep_time)
         try :
             knockApi(message.content, msger[mess_id], str_guild_id)
         except :
             await message.channel.send('ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。')
             return 
         voice_mess = './sound/{}/msg.wav'.format(str_guild_id)
-        mess_time = AudioSegment.from_file(voice_mess, "wav").duration_seconds
+        mess_time[guild_id] = AudioSegment.from_file(voice_mess, "wav").duration_seconds
+        mess_start[guild_id] = time()
         voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess), after=lambda e: print('done', e))
-        sleep(mess_time)
     
     await bot.process_commands(message)
 
