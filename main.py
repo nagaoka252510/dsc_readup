@@ -124,7 +124,8 @@ async def on_message(message):
             sleep_time = time() - mess_start[guild_id]
             sleep(mess_time[guild_id]-sleep_time)
         try :
-            knockApi(message.content, msger[mess_id], str_guild_id)
+            get_msg = message.content.replace('男の娘', 'おとこのこ')
+            knockApi(get_msg , msger[mess_id], str_guild_id)
         except :
             await message.channel.send('ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。')
             return 
