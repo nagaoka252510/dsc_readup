@@ -1,4 +1,4 @@
-# ソースはこちらから引用 https://blog.leko.jp/post/voiceloid-like-text2speech/
+# ソースはこちらから引用 http://blog.cgfm.jp/garyu/archives/3396
 import json
 import os
 import sys
