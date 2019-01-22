@@ -1,3 +1,4 @@
+import re
 import sys
 import json
 from time import sleep, time
@@ -150,7 +151,8 @@ async def on_message(message):
             pass
         # メッセージを、音声ファイルを作成するモジュールへ投げる処理
         try :
-            get_msg = message.content.replace('男の娘', 'おとこのこ')
+            # URLを、"URL"へ置換
+            get_msg = re.sub(r'http(s)?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=]*)?', 'URL', message.content)
             knockApi(get_msg , msger[mess_id], str_guild_id)
         # 失敗した場合(ログは吐くようにしたい)
         except :
