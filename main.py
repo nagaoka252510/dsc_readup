@@ -22,6 +22,10 @@ msger = {} # ユーザごとのボイス情報
 mess_time = {} # ボイスメッセージの再生時間
 mess_start = {} # ボイスメッセージの再生開始時間
 
+#bot自身
+client = discord.Client()
+syabe_taro = client.user
+
 @bot.event
 # ログイン時のイベント
 async def on_ready():
@@ -55,13 +59,19 @@ async def summon(ctx):
     global guild_id
     guild_id = ctx.guild.id # サーバIDを取得
     vo_ch = ctx.author.voice # 召喚した人が参加しているボイスチャンネルを取得
-    # そのサーバのvoiceチャンネルに接続しておらず、かつ召喚した人がボイスチャンネルに接続している場合
-    if guild_id not in voice and not isinstance(vo_ch, type(None)): 
+    # 召喚された時、voiceに情報が残っている場合
+    if guild_id in voice:
+        await voice[guild_id].disconnect()
+        del voice[guild_id] 
+        del channel[guild_id]
+    # 召喚した人がボイスチャンネルにいた場合
+    if not isinstance(vo_ch, type(None)): 
         voice[guild_id] = await vo_ch.channel.connect()
         channel[guild_id] = ctx.channel.id
         await ctx.channel.send('毎度おおきに。わいは喋太郎や。"?help"コマンドで使い方を表示するで')
     else :
         await ctx.channel.send('あんたボイスチャンネルおらへんやんけ！')
+
 
 # byeコマンドの処理            
 @bot.command()
