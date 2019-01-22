@@ -135,14 +135,7 @@ async def on_message(message):
 
     # メッセージを、呼び出されたチャンネルで受信した場合
     if message.channel.id == channel[guild_id]:
-        # 音声ファイルを再生中の場合
-        '''
-        if voice[guild_id].is_playing() :
-            # 現在時刻から、音声再生開始時間を引き、それを音声再生時間から引いてsleep
-            # このsleep処理は、メッセージ連投時の、同一ボイスチャンネルでの音声同時再生を避けるため
-            sleep_time = time() - mess_start[guild_id]
-            sleep(mess_time[guild_id]-sleep_time)
-        '''
+        # 音声ファイルを再生中の場合再生終了まで止まる
         while (voice[guild_id].is_playing()):
             pass
         # メッセージを、音声ファイルを作成するモジュールへ投げる処理
