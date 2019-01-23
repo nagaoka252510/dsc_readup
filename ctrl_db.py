@@ -31,8 +31,8 @@ class Guild(Base):
     name = Column(String)
     ardnotify = orm.relationship("ArdNotify")
 
-url = 'postgresql+psycopg2://taro:password@localhost/taro_dsc'
-engine = create_engine(url, echo=True)
+url = 'postgresql+psycopg2://taro@localhost/taro_dsc'
+engine = create_engine(url)
 
 def main():
     Base.metadata.create_all(engine)
