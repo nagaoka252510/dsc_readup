@@ -2,3 +2,6 @@ discord
 pynacl
 pydub
 requests
+SQLAlchemy
+psycopg2
+psycopg2-binary
