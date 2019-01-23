@@ -72,9 +72,11 @@ async def summon(ctx):
         channel[guild_id] = ctx.channel.id
         add_guild_db(ctx.guild)
         noties = notify(ctx)
+        await ctx.channel.send('毎度おおきに。わいは喋太郎や。"?help"コマンドで使い方を表示するで')
         for noty in noties:
             await ctx.channel.send(noty)
-        await ctx.channel.send('毎度おおきに。わいは喋太郎や。"?help"コマンドで使い方を表示するで')
+        if len(noties) != 0:
+            await ctx.channel.send('もし良ければ、製作者にポップコーンでも奢ってあげてください\rhttp://amzn.asia/5fx6FNv')
     else :
         await ctx.channel.send('あんたボイスチャンネルおらへんやんけ！')
 
