@@ -1,4 +1,7 @@
 {
     "docomo":"docomo Deveroper TOKEN",
-    "bot":"BOT TOKEN"
+    "bot":"BOT TOKEN",
+    "manager_id":"BOT MANAGER DISCORD ID",
+    "db_user":"taro",
+    "db_pass":"password"
 }

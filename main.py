@@ -1,17 +1,20 @@
 import re
 import sys
 import json
-from time import sleep, time
+import psycopg2
 import discord
+import ctrl_db
 from discord.ext import commands
 from pydub import AudioSegment
 from voice import knockApi
+
 
 # Discord アクセストークン読み込み
 with open('token.json') as f:
     df = json.load(f)
 
 token = df["bot"]
+manager = int(df["manager_id"])
 
 # コマンドプレフィックスを設定
 bot = commands.Bot(command_prefix='?')
@@ -20,8 +23,6 @@ bot = commands.Bot(command_prefix='?')
 voice = {} # ボイスチャンネルID
 channel = {} # テキストチャンネルID
 msger = {} # ユーザごとのボイス情報
-mess_time = {} # ボイスメッセージの再生時間
-mess_start = {} # ボイスメッセージの再生開始時間
 
 #bot自身
 client = discord.Client()
@@ -69,7 +70,13 @@ async def summon(ctx):
     if not isinstance(vo_ch, type(None)): 
         voice[guild_id] = await vo_ch.channel.connect()
         channel[guild_id] = ctx.channel.id
+        add_guild_db(ctx.guild)
+        noties = notify(ctx)
         await ctx.channel.send('毎度おおきに。わいは喋太郎や。"?help"コマンドで使い方を表示するで')
+        for noty in noties:
+            await ctx.channel.send(noty)
+        if len(noties) != 0:
+            await ctx.channel.send('もし良ければ、製作者にポップコーンでも奢ってあげてください\rhttp://amzn.asia/5fx6FNv')
     else :
         await ctx.channel.send('あんたボイスチャンネルおらへんやんけ！')
 
@@ -119,6 +126,13 @@ async def ai(ctx):
     if ctx.channel.id == channel[guild_id]:
         msger[ctx.author.id] = "anzu" # 月読アイに変更
 
+@bot.command()
+async def notify(ctx, arg1, arg2):
+    # 管理人からしか受け付けない
+    if ctx.author.id != manager:
+        return
+    ctrl_db.add_news(arg1, arg2.replace("\\r", "\r"))
+
 
 # メッセージを受信した時の処理
 @bot.event
@@ -131,6 +145,23 @@ async def on_message(message):
     global mess_time
     global mess_start
     mess_id = message.author.id # メッセージを送った人のユーザID
+
+    #ギルドIDがない場合、DMと判断する
+    if isinstance(message.guild, type(None)):
+        # 管理人からのDMだった場合
+        if message.author.id == manager:
+            #コマンド操作になっているか
+            if message.content.startswith("?"):
+                await message.channel.send("コマンドを受け付けたで")
+                await bot.process_commands(message) # メッセージをコマンド扱いにする
+                return
+            else:
+                await message.channel.send("コマンド操作をしてくれ")
+                return
+        else:
+            await message.channel.send("喋太郎に何かあれば、だーやまんの質問箱(https://peing.net/ja/gamerkohei?event=0)までお願いします。")
+            return
+
     guild_id = message.guild.id # サーバID
 
     # ユーザに話者が設定されていない場合
@@ -161,10 +192,32 @@ async def on_message(message):
         
         # 再生処理
         voice_mess = './sound/{}/msg.wav'.format(str_guild_id) # 音声ファイルのディレクトリ
-        mess_time[guild_id] = AudioSegment.from_file(voice_mess, "wav").duration_seconds # 再生時間の取得
-        mess_start[guild_id] = time() # 再生開始時刻の取得
         voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess), after=lambda e: print('done', e)) # 音声チャンネルで再生
     
     await bot.process_commands(message)
+
+def add_guild_db(guild):
+    str_id = str(guild.id)
+    guilds = ctrl_db.get_guild(str_id)
+
+    if isinstance(guilds, type(None)):
+        ctrl_db.add_guild(str_id, guild.name)
+
+def notify(ctx):
+    str_id = str(ctx.guild.id)
+    notifis = ctrl_db.get_notify(str_id)
+    newses = ctrl_db.get_news()
+    list_noty = []
+
+    for new in newses:
+        is_notify = False
+        for noty in notifis:
+            if new.id == noty.news_id:
+                is_notify = True
+        if is_notify == False:
+            list_noty.append('[{}] {}'.format(new.category, new.text))
+            ctrl_db.add_notify(new.id, str_id)
+    
+    return list_noty
 
 bot.run(token)
