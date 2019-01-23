@@ -12,6 +12,7 @@ with open('token.json') as f:
     df = json.load(f)
 
 token = df["bot"]
+manager = int(df["manager_id"])
 
 # コマンドプレフィックスを設定
 bot = commands.Bot(command_prefix='?')
@@ -131,6 +132,16 @@ async def on_message(message):
     global mess_time
     global mess_start
     mess_id = message.author.id # メッセージを送った人のユーザID
+
+    # 管理人からのDMだった場合
+    if isinstance(message.guild, type(None)):
+        if message.author.id == manager:
+            # メッセージ登録作業
+            await message.channel.send("メッセージ受け付けたで")
+            return
+        else:
+            return
+
     guild_id = message.guild.id # サーバID
 
     # ユーザに話者が設定されていない場合
