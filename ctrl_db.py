@@ -30,6 +30,22 @@ class Guild(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     ardnotify = orm.relationship("ArdNotify")
+    dictionaly = orm.relationship("Dict")
+
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(String, primary_key=True)
+    name = Column(String)
+    speaker = Column(String)
+
+class Dict(Base):
+    __tablename__ = 'dict'
+
+    id = Column(String, primary_key=True)
+    word = Column(String, unique = True)
+    read = Column(String)
+    server_id = Column(String, ForeignKey('guild.id', onupdate='CASCADE', ondelete='CASCADE'))
 
 url = 'postgresql+psycopg2://taro@localhost/taro_dsc'
 engine = create_engine(url)
@@ -75,3 +91,20 @@ def get_guild(guild_id):
     guilds = session.query(Guild).filter_by(id=guild_id).one_or_none()
 
     return guilds
+
+def add_user(user_id, name, speaker):
+    user = Guild(id=guild_id, name=name, speaker=speaker)
+
+    session.add(user)
+    session.commit()
+
+def set_user(user_id, speaker):
+    user = session.query(User).filter_by(id=user_id).one()
+    user.speaker = speaker
+
+    session.commit()
+
+def get_user(user_id):
+    users = session.query(User).filter_by(id=user_id).one_or_none()
+
+    return users

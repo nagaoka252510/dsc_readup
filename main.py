@@ -16,6 +16,10 @@ with open('token.json') as f:
 token = df["bot"]
 manager = int(df["manager_id"])
 
+# Speakerの配列
+
+sps = ['sumire', 'maki', 'ai', 'kou']
+
 # コマンドプレフィックスを設定
 bot = commands.Bot(command_prefix='?')
 
@@ -45,10 +49,7 @@ async def help(ctx):
     embed = discord.Embed(title='喋太郎', description='メッセージを読み上げるBotやで。')
     embed.add_field(name='?summon', value='わいをボイスチャンネルに呼ぶコマンドや。', inline=False)
     embed.add_field(name='?bye', value='わいをボイスチャンネルから追い出す時に使うんや。', inline=False)
-    embed.add_field(name='?yukari', value='声がゆかりはんに変わるで。', inline=False)
-    embed.add_field(name='?maki', value='声がマキマキに変わるで。', inline=False)
-    embed.add_field(name='?kou', value='声がコウはんに変わるで。', inline=False)
-    embed.add_field(name='?ai', value='声がアイちゃんに変わるで。', inline=False)
+    embed.add_field(name='?spk', value='声を変えるのに使うで。詳しくは、「?spk help」を見てほしい。', inline=False)
 
     await ctx.send(embed=embed)
 
@@ -96,35 +97,33 @@ async def bye(ctx):
         del voice[guild_id] 
         del channel[guild_id]
 
-# yukariコマンドの処理
+# speakerコマンドの処理
 @bot.command()
-async def yukari(ctx):
-    global msger
+async def spk(ctx, arg1):
+    cand = arg1
     guild_id = ctx.guild.id
-    # 呼び出したチャンネルでコマンドが叩かれた場合
-    if ctx.channel.id == channel[guild_id]:
-        msger[ctx.author.id] = "sumire" # 話者をsumire(結月ゆかり)に変更
 
-@bot.command()
-async def maki(ctx):
-    global msger
-    guild_id = ctx.guild.id
-    if ctx.channel.id == channel[guild_id]:
-        msger[ctx.author.id] = "maki" # 弦巻マキに変更
+    if cand == 'help':
+        embed = discord.Embed(title='?spk', description='声を変えるコマンド')
+        embed.add_field(name='?spk yukari', value='ゆかりさんに変身', inline=False)
+        embed.add_field(name='?spk maki', value='マキマキに変身', inline=False)
+        embed.add_field(name='?spk ai', value='アイちゃんに変身', inline=False)
+        embed.add_field(name='?spk kou', value='コウ先生に変身', inline=False)
+    else:
+        # 呼び出したチャンネルでコマンドが叩かれた場合
+        if ctx.channel.id == channel[guild_id]:
+            if cand not in sps:
+                # 引き数のキャラが存在しない場合
+                await ctx.channel.send('おっと、そのキャラは未実装だ。すまねえ。')
+            else if cand == 'ai':
+                # アイの場合
+                cand = 'anzu'
+            else if cand == 'kou':
+                # コウの場合
+                cand = 'osamu'
 
-@bot.command()
-async def kou(ctx):
-    global msger
-    guild_id = ctx.guild.id
-    if ctx.channel.id == channel[guild_id]:
-        msger[ctx.author.id] = "osamu" # 水奈瀬コウに変更
-
-@bot.command()
-async def ai(ctx):
-    global msger
-    guild_id = ctx.guild.id
-    if ctx.channel.id == channel[guild_id]:
-        msger[ctx.author.id] = "anzu" # 月読アイに変更
+            # 話者を設定
+            ctrl_db.set_user(str(ctx.author.id), cand)
 
 @bot.command()
 async def notify(ctx, arg1, arg2):
@@ -164,9 +163,12 @@ async def on_message(message):
 
     guild_id = message.guild.id # サーバID
 
-    # ユーザに話者が設定されていない場合
-    if mess_id not in msger:
-        msger[mess_id] = 'sumire' # 話者をsumireに設定
+    # ユーザ情報(speaker)を取得
+    user = ctrl_db.get_user(str(mess_id))
+    if isinstance(user, type(None)):
+        # ユーザ情報がなければ、dbへ登録。話者はsumire
+        ctrl_db.add_user(str(mess_id), message.author.name, 'sumire')
+        user = ctrl_db.get_user(str(mess_id))
 
     # 召喚されていないか、コマンドだった場合
     if guild_id not in channel or message.content.startswith("?"):
@@ -184,7 +186,7 @@ async def on_message(message):
         try :
             # URLを、"URL"へ置換
             get_msg = re.sub(r'http(s)?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=]*)?', 'URL', message.content)
-            knockApi(get_msg , msger[mess_id], str_guild_id)
+            knockApi(get_msg , user.speaker, str_guild_id)
         # 失敗した場合(ログは吐くようにしたい)
         except :
             await message.channel.send('ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。')
