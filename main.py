@@ -26,7 +26,6 @@ bot = commands.Bot(command_prefix='?')
 # サーバ別に各値を保持
 voice = {} # ボイスチャンネルID
 channel = {} # テキストチャンネルID
-msger = {} # ユーザごとのボイス情報
 
 #bot自身
 client = discord.Client()
@@ -109,6 +108,8 @@ async def spk(ctx, arg1):
         embed.add_field(name='?spk maki', value='マキマキに変身', inline=False)
         embed.add_field(name='?spk ai', value='アイちゃんに変身', inline=False)
         embed.add_field(name='?spk kou', value='コウ先生に変身', inline=False)
+
+        await ctx.send(embed=embed)
     else:
         # 呼び出したチャンネルでコマンドが叩かれた場合
         if ctx.channel.id == channel[guild_id]:
