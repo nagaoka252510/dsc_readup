@@ -29,6 +29,7 @@ class Guild(Base):
 
     id = Column(String, primary_key=True)
     name = Column(String)
+    prefix = Column(String)
     ardnotify = orm.relationship("ArdNotify")
     dictionaly = orm.relationship("Dict")
 
@@ -39,8 +40,8 @@ class User(Base):
     name = Column(String)
     speaker = Column(String)
 
-class Dict(Base):
-    __tablename__ = 'dict'
+class Dictionaly(Base):
+    __tablename__ = 'dictionaly'
 
     id = Column(String, primary_key=True)
     word = Column(String, unique = True)
