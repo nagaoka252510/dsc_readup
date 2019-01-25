@@ -1,7 +1,6 @@
 import re
 import sys
 import json
-import psycopg2
 import discord
 import ctrl_db
 from discord.ext import commands
@@ -71,7 +70,7 @@ async def summon(ctx):
         voice[guild_id] = await vo_ch.channel.connect()
         channel[guild_id] = ctx.channel.id
         add_guild_db(ctx.guild)
-        noties = notify(ctx)
+        noties = get_notify(ctx)
         await ctx.channel.send('毎度おおきに。わいは喋太郎や。"?help"コマンドで使い方を表示するで')
         for noty in noties:
             await ctx.channel.send(noty)
@@ -142,8 +141,7 @@ async def on_message(message):
     global voice
     global channel
     global msger
-    global mess_time
-    global mess_start
+
     mess_id = message.author.id # メッセージを送った人のユーザID
 
     #ギルドIDがない場合、DMと判断する
@@ -180,13 +178,16 @@ async def on_message(message):
         # 音声ファイルを再生中の場合再生終了まで止まる
         while (voice[guild_id].is_playing()):
             pass
-        # メッセージを、音声ファイルを作成するモジュールへ投げる処理
-        try :
-            # URLを、"URL"へ置換
-            get_msg = re.sub(r'http(s)?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=]*)?', 'URL', message.content)
+        # URLを、"URL"へ置換
+        get_msg = re.sub(r'http(s)?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=]*)?', 'URL', message.content)
+        # 辞書dbから、鯖で登録された単語を抽出し、置換する
+        # w_dict = ctrl_db.get_dict(str_guild_id)
+        for word in w_dict:
+            get_msg = get_msg.replace(word.word, word.read)
+    
+        try : # メッセージを、音声ファイルを作成するモジュールへ投げる処理
             knockApi(get_msg , msger[mess_id], str_guild_id)
-        # 失敗した場合(ログは吐くようにしたい)
-        except :
+        except : # 失敗した場合(ログは吐くようにしたい)
             await message.channel.send('ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。')
             return 
         
@@ -203,7 +204,7 @@ def add_guild_db(guild):
     if isinstance(guilds, type(None)):
         ctrl_db.add_guild(str_id, guild.name)
 
-def notify(ctx):
+def get_notify(ctx):
     str_id = str(ctx.guild.id)
     notifis = ctrl_db.get_notify(str_id)
     newses = ctrl_db.get_news()
