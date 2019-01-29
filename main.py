@@ -8,13 +8,12 @@ from discord.ext import commands
 from pydub import AudioSegment
 from voice import knockApi
 
-
 # Discord アクセストークン読み込み
 with open('token.json') as f:
     df = json.load(f)
 
-token = df["bot"]
-manager = int(df["manager_id"])
+token = df['bot']
+manager = int(df['manager_id'])
 
 # Speakerの配列
 
@@ -171,7 +170,7 @@ async def notify(ctx, arg1, arg2):
     # 管理人からしか受け付けない
     if ctx.author.id != manager:
         return
-    ctrl_db.add_news(arg1, arg2.replace("\\r", "\r"))
+    ctrl_db.add_news(arg1, arg2.replace('\\r', '\r'))
 
 
 # メッセージを受信した時の処理
@@ -191,15 +190,15 @@ async def on_message(message):
         # 管理人からのDMだった場合
         if message.author.id == manager:
             #コマンド操作になっているか
-            if message.content.startswith("?"):
-                await message.channel.send("コマンドを受け付けたで")
+            if message.content.startswith('?'):
+                await message.channel.send('コマンドを受け付けたで')
                 await bot.process_commands(message) # メッセージをコマンド扱いにする
                 return
             else:
-                await message.channel.send("コマンド操作をしてくれ")
+                await message.channel.send('コマンド操作をしてくれ')
                 return
         else:
-            await message.channel.send("喋太郎に何かあれば、だーやまんの質問箱(https://peing.net/ja/gamerkohei?event=0)までお願いします。")
+            await message.channel.send('喋太郎に何かあれば、だーやまんの質問箱(https://peing.net/ja/gamerkohei?event=0)までお願いします。')
             return
 
     guild_id = message.guild.id # サーバID
@@ -249,8 +248,6 @@ async def on_message(message):
         # 再生処理
         voice_mess = './sound/{}/msg.wav'.format(str_guild_id) # 音声ファイルのディレクトリ
         voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess), after=lambda e: print('done', e)) # 音声チャンネルで再生
-    
-    # await bot.process_commands(message)
 
 def add_guild_db(guild):
     str_id = str(guild.id)
