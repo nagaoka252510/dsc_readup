@@ -31,7 +31,7 @@ class Guild(Base):
     name = Column(String)
     prefix = Column(String)
     ardnotify = orm.relationship("ArdNotify")
-    dictionaly = orm.relationship("Dict")
+    dictionaly = orm.relationship("Dictionaly")
 
 class User(Base):
     __tablename__ = 'user'
@@ -82,10 +82,16 @@ def get_notify(guild_id):
 
     return notifications
 
-def add_guild(guild_id, name):
-    guild = Guild(id=guild_id, name=name)
+def add_guild(guild_id, name, prefix):
+    guild = Guild(id=guild_id, name=name, prefix=prefix)
 
     session.add(guild)
+    session.commit()
+
+def set_prefix(guild_id, prefix):
+    guild = session.query(Guild).filter_by(id=guild_id).one()
+    guild.prefix = prefix
+
     session.commit()
 
 def get_guild(guild_id):
@@ -94,7 +100,7 @@ def get_guild(guild_id):
     return guilds
 
 def add_user(user_id, name, speaker):
-    user = Guild(id=guild_id, name=name, speaker=speaker)
+    user = User(id=user_id, name=name, speaker=speaker)
 
     session.add(user)
     session.commit()
