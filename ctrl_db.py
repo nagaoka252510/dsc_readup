@@ -43,7 +43,7 @@ class User(Base):
 class Dictionaly(Base):
     __tablename__ = 'dictionaly'
 
-    id = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     word = Column(String, unique = True)
     read = Column(String)
     server_id = Column(String, ForeignKey('guild.id', onupdate='CASCADE', ondelete='CASCADE'))
@@ -116,14 +116,33 @@ def get_user(user_id):
 
     return users
 
-def add_dict():
-    pass
+def add_dict(word, read, server_id):
+    dictionary = session.query(Dictionaly).filter_by(word=word, server_id=server_id).one_or_none()
+    if isinstance(dictionary, type(None)):
+        dictionary = Dictionaly(word=word, read=read, server_id=server_id)
 
-def set_dict():
-    pass
+        session.add(dictionary)
+        session.commit()
+    else:
+        set_dict(read, dictionary)
 
-def get_dict():
-    pass
+def set_dict(read, dictionary):
+    dictionary.read = read
 
-def del_dict():
-    pass
+    session.commit()
+
+def get_dict(server_id):
+    dictionary = session.query(Dictionaly).filter_by(server_id=server_id)
+
+    return dictionary
+
+def del_dict(id):
+    found_dict = session.query(Dictionaly).filter_by(id=id).one_or_none()
+    
+    if isinstance(found_dict, type(None)):
+        return None
+    else:
+        session.delete(found_dict)
+
+        session.commit()
+        return True
