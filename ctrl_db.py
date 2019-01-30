@@ -115,3 +115,15 @@ def get_user(user_id):
     users = session.query(User).filter_by(id=user_id).one_or_none()
 
     return users
+
+def add_dict():
+    pass
+
+def set_dict():
+    pass
+
+def get_dict():
+    pass
+
+def del_dict():
+    pass
