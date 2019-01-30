@@ -212,7 +212,7 @@ async def wbook(ctx, arg1='emp', arg2='emp', arg3='emp'):
             await ctx.send('引数が不足してるで。{}wbook helpを見てみ。'.format(prefix))
         elif arg2.isdecimal():
             # 削除処理
-            is_del = ctrl_db.del_dict(int(arg2))
+            is_del = ctrl_db.del_dict(int(arg2), str_id)
             if is_del == True:
                 await ctx.send('削除成功や。')
             else:

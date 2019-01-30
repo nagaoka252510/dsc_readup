@@ -136,8 +136,8 @@ def get_dict(server_id):
 
     return dictionary
 
-def del_dict(id):
-    found_dict = session.query(Dictionaly).filter_by(id=id).one_or_none()
+def del_dict(id, str_id):
+    found_dict = session.query(Dictionaly).filter_by(id=id, server_id=str_id).one_or_none()
     
     if isinstance(found_dict, type(None)):
         return None
