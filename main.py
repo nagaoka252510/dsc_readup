@@ -56,6 +56,7 @@ async def help(ctx):
     embed.add_field(name='{}bye'.format(prefix), value='わいをボイスチャンネルから追い出す時に使うんや。', inline=False)
     embed.add_field(name='{}spk'.format(prefix), value='声を変えるのに使うで。詳しくは、「{}spk help」を見てほしい。'.format(prefix), inline=False)
     embed.add_field(name='{}set_prefix'.format(prefix), value='コマンドプレフィックスを変更するのに使うで。「{}set_prefix ??」みたいにするといいぞ。'.format(prefix), inline=False)
+    embed.add_field(name='{}wbook'.format(prefix), value='読み仮名の登録とかができるで。詳しくは、「{}wbook help」を見て欲しい。'.format(prefix), inline=False)
 
     await ctx.send(embed=embed)
 
@@ -164,13 +165,63 @@ async def set_prefix(ctx, arg1):
     ctrl_db.set_prefix(guild_id, arg1)
     await ctx.send('prefixを{}に変更したで。'.format(arg1))
 
-
 @bot.command()
 async def notify(ctx, arg1, arg2):
     # 管理人からしか受け付けない
     if ctx.author.id != manager:
         return
     ctrl_db.add_news(arg1, arg2.replace('\\r', '\r'))
+
+#辞書の操作をするコマンド
+@bot.command()
+async def wbook(ctx, arg1='emp', arg2='emp', arg3='emp'):
+    guild_id = ctx.guild.id
+    str_id = str(guild_id)
+    guild_deta = ctrl_db.get_guild(str_id)
+    if isinstance(guild_deta, type(None)):
+        prefix = '?'
+    else:
+        prefix = guild_deta.prefix
+
+    if arg1 == 'help':
+        embed = discord.Embed(title='{}wbook'.format(prefix), description='辞書を操作するコマンド。データはサーバ毎に分けられてるから安心してな。')
+        embed.add_field(name='{}wbook add 単語 よみがな'.format(prefix), value='読み上げ文にこの単語があった場合、よみがなの通りに読み変えるで。\r例:{}wbook add 男の娘 おとこのこ'.format(prefix), inline=False)
+        embed.add_field(name='{}wbook list'.format(prefix), value='登録した単語の一覧を表示するで。', inline=False)
+        embed.add_field(name='{}wbook delete 番号'.format(prefix), value='listで表示された辞書番号の単語を削除するで', inline=False)
+
+        await ctx.send(embed=embed)
+
+    elif arg1 == 'list':
+        # リスト表示
+        words = ctrl_db.get_dict(str_id)
+        embed = discord.Embed(title='辞書一覧')
+        embed.add_field(name='番号', value='単語:よみがな', inline=False)
+        for word in words:
+            embed.add_field(name=str(word.id), value='{}:{}'.format(word.word, word.read), inline=False)
+
+        await ctx.send(embed=embed)
+
+    elif arg1 == 'add':
+        if arg2 == 'emp' or arg3 == 'emp':
+            await ctx.send('引数が不足してるで。{}wbook helpを見てみ。'.format(prefix))
+        # 辞書追加、あるいはアップデート
+        ctrl_db.add_dict(arg2, arg3, str_id)
+
+    elif arg1 == 'delete':
+        if arg2 == 'emp':
+            await ctx.send('引数が不足してるで。{}wbook helpを見てみ。'.format(prefix))
+        elif arg2.isdecimal():
+            # 削除処理
+            is_del = ctrl_db.del_dict(int(arg2))
+            if is_del == True:
+                await ctx.send('削除成功や。')
+            else:
+                await ctx.send('その番号の単語は登録されてないで。')
+        else:
+            await ctx.send('使い方が正しくないで。{}wbook helpを見てみ。'.format(prefix))
+    else:
+        await ctx.send('使い方が正しくないで。{}wbook helpを見てみ。'.format(prefix))
+
 
 
 # メッセージを受信した時の処理
@@ -198,7 +249,7 @@ async def on_message(message):
                 await message.channel.send('コマンド操作をしてくれ')
                 return
         else:
-            await message.channel.send('喋太郎に何かあれば、だーやまんの質問箱(https://peing.net/ja/gamerkohei?event=0)までお願いします。')
+            await message.channel.send('喋太郎に何かあれば、だーやまんのお題箱(https://odaibako.net/u/gamerkohei )までお願いします。')
             return
 
     guild_id = message.guild.id # サーバID
@@ -235,10 +286,14 @@ async def on_message(message):
         # 音声ファイルを再生中の場合再生終了まで止まる
         while (voice[guild_id].is_playing()):
             pass
+        # 置換文字のリストを取得
+        words = ctrl_db.get_dict(str_guild_id)
         # メッセージを、音声ファイルを作成するモジュールへ投げる処理
         try :
             # URLを、"URL"へ置換
             get_msg = re.sub(r'http(s)?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=]*)?', 'URL', message.content)
+            for word in words:
+                get_msg = get_msg.replace(word.word, word.read)
             knockApi(get_msg , user.speaker, str_guild_id)
         # 失敗した場合(ログは吐くようにしたい)
         except :
