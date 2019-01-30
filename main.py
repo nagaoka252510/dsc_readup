@@ -185,7 +185,7 @@ async def wbook(ctx, arg1='emp', arg2='emp', arg3='emp'):
 
     if arg1 == 'help':
         embed = discord.Embed(title='{}wbook'.format(prefix), description='辞書を操作するコマンド。データはサーバ毎に分けられてるから安心してな。')
-        embed.add_field(name='{}wbook add 単語 よみがな(ひらがなで)'.format(prefix), value='読み上げ文にこの単語があった場合、よみがなの通りに読み変えるで。\r例:{}wbook add 男の娘 おとこのこ'.format(prefix), inline=False)
+        embed.add_field(name='{}wbook add 単語 よみがな'.format(prefix), value='読み上げ文にこの単語があった場合、よみがなの通りに読み変えるで。\r例:{}wbook add 男の娘 おとこのこ'.format(prefix), inline=False)
         embed.add_field(name='{}wbook list'.format(prefix), value='登録した単語の一覧を表示するで。', inline=False)
         embed.add_field(name='{}wbook delete 番号'.format(prefix), value='listで表示された辞書番号の単語を削除するで', inline=False)
 
@@ -249,7 +249,7 @@ async def on_message(message):
                 await message.channel.send('コマンド操作をしてくれ')
                 return
         else:
-            await message.channel.send('喋太郎に何かあれば、だーやまんの質問箱(https://peing.net/ja/gamerkohei?event=0)までお願いします。')
+            await message.channel.send('喋太郎に何かあれば、だーやまんのお題箱(https://odaibako.net/u/gamerkohei )までお願いします。')
             return
 
     guild_id = message.guild.id # サーバID
