@@ -44,7 +44,7 @@ class Dictionaly(Base):
     __tablename__ = 'dictionaly'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    word = Column(String, unique = True)
+    word = Column(String)
     read = Column(String)
     server_id = Column(String, ForeignKey('guild.id', onupdate='CASCADE', ondelete='CASCADE'))
 
