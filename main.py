@@ -88,7 +88,7 @@ async def summon(ctx):
     if not isinstance(vo_ch, type(None)): 
         voice[guild_id] = await vo_ch.channel.connect()
         channel[guild_id] = ctx.channel.id
-        noties = notify(ctx)
+        noties = get_notify(ctx)
         await ctx.channel.send('毎度おおきに。わいは喋太郎や。"{}help"コマンドで使い方を表示するで'.format(prefix))
         for noty in noties:
             await ctx.channel.send(noty)
@@ -294,15 +294,17 @@ async def on_message(message):
             get_msg = re.sub(r'http(s)?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=]*)?', 'URL', message.content)
             for word in words:
                 get_msg = get_msg.replace(word.word, word.read)
-            knockApi(get_msg , user.speaker, str_guild_id)
+            rawfile = await knockApi(get_msg , user.speaker, str_guild_id)
         # 失敗した場合(ログは吐くようにしたい)
-        except :
+        except Exception as e:
+            print("例外args:", e.args)
             await message.channel.send('ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。')
             return 
         
         # 再生処理
-        voice_mess = './sound/{}/msg.wav'.format(str_guild_id) # 音声ファイルのディレクトリ
-        voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess), after=lambda e: print('done', e)) # 音声チャンネルで再生
+        # voice_mess = './sound/{}/msg.wav'.format(str_guild_id) # 音声ファイルのディレクトリ
+        voice_mess = './cache/{}/{}'.format(str_guild_id, rawfile)
+        voice[guild_id].play(discord.PCMAudio(voice_mess), after=lambda e: print('done', e)) # 音声チャンネルで再生
 
 def add_guild_db(guild):
     str_id = str(guild.id)
@@ -313,7 +315,7 @@ def add_guild_db(guild):
     if isinstance(guilds, type(None)):
         ctrl_db.add_guild(str_id, guild.name, prefix)
 
-def notify(ctx):
+def get_notify(ctx):
     str_id = str(ctx.guild.id)
     notifis = ctrl_db.get_notify(str_id)
     newses = ctrl_db.get_news()
