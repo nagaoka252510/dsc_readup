@@ -6,7 +6,11 @@ import datetime
 import argparse
 import subprocess
 import requests
+import aiohttp
+import asyncio
+import async_timeout
 import pprint
+
  
 # config
 # ===========================================
@@ -33,8 +37,17 @@ https://dev.smt.docomo.ne.jp/?p=docs.api.page&api_name=text_to_speech&p_name=api
     'volume' : 音量。基準値:1.0、範囲:0.00～2.00
 """
  
+async def fetch(session, url, data_fm, headers):
+    with async_timeout.timeout(10):
+        async with session.post(url, data=data_fm, headers=headers) as response:
+            
+            if response.status != 200 :
+                print("Error API : " + str(response.status))
+                exit()
+            
+            return await response.read()
 
-def knockApi(makemsg, msger, group):
+async def knockApi(makemsg, msger, group):
 
     #バイナリデータの一時保存場所
     tmp = "./cache/{}/".format(group)
@@ -80,28 +93,19 @@ def knockApi(makemsg, msger, group):
     # ===========================================
     #print("Start API")
     
-    response = requests.post(
-        url,
-        data=xml,
-        headers={
-            'Content-Type': 'application/ssml+xml',
-            'Accept' : 'audio/L16',
-            'Content-Length' : str(len(xml))
-        }
-    )
-    
-    #print(response)
-    #print(response.encoding)
-    #print(response.status_code)
-    #print(response.content)
-    
-    if response.status_code != 200 :
-        #print("Error API : " + str(response.status_code))
-        exit()
-    
-    else :
-        pass
-        #print("Success API")
+    async with aiohttp.ClientSession() as session:
+        response = await fetch(session,
+            url,
+            data_fm=xml,
+            headers={
+                'Content-Type': 'application/ssml+xml',
+                'Accept' : 'audio/L16',
+                'Content-Length' : str(len(xml))
+            }
+        )
+
+    # print(response.status)
+    # print(response.content_type)
     
     #現在日時を取得
     now = datetime.datetime.now()
@@ -109,20 +113,14 @@ def knockApi(makemsg, msger, group):
     
     #保存するファイル名
     rawFile = tstr + ".raw"
-    wavFile = "msg.wav"
-    
+    # wavFile = "msg.wav"
+
     #バイナリデータを保存
     fp = open(tmp + rawFile, 'wb')
-    fp.write(response.content)
+    fp.write(response)
     fp.close()
     
     #print("Save Binary Data : " + tmp + rawFile)
     
-    
-    # バイナリデータ → wav に変換
-    # ===========================================
-    
-    # macのsoxを使って raw→wavに変換
-    cmd = "sox -t raw -r 16k -e signed -b 16 -B -c 1 " + tmp + rawFile + " "+ soundDir + wavFile
-    # コマンドの実行
-    subprocess.check_output(cmd, shell=True)
+    # PCM名を返す
+    return rawFile

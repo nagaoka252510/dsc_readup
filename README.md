@@ -3,4 +3,3 @@
 - opus
 - libffi
 - ffmpeg --with-opus
-- sox
