@@ -1,12 +1,21 @@
 import re
 import sys
 import json
+import logging
 import psycopg2
 import discord
+import asyncio
 import ctrl_db
 from discord.ext import commands
 from pydub import AudioSegment
 from voice import knockApi
+
+# ログを出力
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='syabetaro.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 # Discord アクセストークン読み込み
 with open('token.json') as f:
@@ -285,7 +294,8 @@ async def on_message(message):
     if message.channel.id == channel[guild_id]:
         # 音声ファイルを再生中の場合再生終了まで止まる
         while (voice[guild_id].is_playing()):
-            pass
+            # 他の処理をさせて1秒待機
+            await asyncio.sleep(1)
         # 置換文字のリストを取得
         words = ctrl_db.get_dict(str_guild_id)
         # メッセージを、音声ファイルを作成するモジュールへ投げる処理
@@ -296,15 +306,14 @@ async def on_message(message):
                 get_msg = get_msg.replace(word.word, word.read)
             rawfile = await knockApi(get_msg , user.speaker, str_guild_id)
         # 失敗した場合(ログは吐くようにしたい)
-        except Exception as e:
-            print("例外args:", e.args)
+        except:
             await message.channel.send('ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。')
-            return 
+            return
         
         # 再生処理
-        # voice_mess = './sound/{}/msg.wav'.format(str_guild_id) # 音声ファイルのディレクトリ
-        voice_mess = './cache/{}/{}'.format(str_guild_id, rawfile)
-        voice[guild_id].play(discord.PCMAudio(voice_mess), after=lambda e: print('done', e)) # 音声チャンネルで再生
+        voice_mess = './cache/{}/{}'.format(str_guild_id, rawfile) # rawファイルのディレクトリ
+        voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess, before_options='-f s16be -ar 16k -ac 1')) # エンコードして音声チャンネルで再生
+
 
 def add_guild_db(guild):
     str_id = str(guild.id)

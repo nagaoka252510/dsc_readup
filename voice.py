@@ -10,6 +10,7 @@ import aiohttp
 import asyncio
 import async_timeout
 import pprint
+
  
 # config
 # ===========================================
@@ -39,10 +40,11 @@ https://dev.smt.docomo.ne.jp/?p=docs.api.page&api_name=text_to_speech&p_name=api
 async def fetch(session, url, data_fm, headers):
     with async_timeout.timeout(10):
         async with session.post(url, data=data_fm, headers=headers) as response:
+            
             if response.status != 200 :
                 print("Error API : " + str(response.status))
                 exit()
-            print(type(response))
+            
             return await response.read()
 
 async def knockApi(makemsg, msger, group):
@@ -101,7 +103,7 @@ async def knockApi(makemsg, msger, group):
                 'Content-Length' : str(len(xml))
             }
         )
-    
+
     # print(response.status)
     # print(response.content_type)
     
@@ -122,12 +124,3 @@ async def knockApi(makemsg, msger, group):
     
     # PCM名を返す
     return rawFile
-    '''
-    # バイナリデータ → wav に変換
-    # ===========================================
-    
-    # macのsoxを使って raw→wavに変換
-    cmd = "sox -t raw -r 16k -e signed -b 16 -B -c 1 " + tmp + rawFile + " "+ soundDir + wavFile
-    # コマンドの実行
-    subprocess.check_output(cmd, shell=True)
-    '''
