@@ -35,10 +35,6 @@ bot = commands.Bot(command_prefix='?')
 voice = {} # ボイスチャンネルID
 channel = {} # テキストチャンネルID
 
-#bot自身
-client = discord.Client()
-syabe_taro = client.user
-
 @bot.event
 # ログイン時のイベント
 async def on_ready():
@@ -181,6 +177,19 @@ async def notify(ctx, arg1, arg2):
         return
     ctrl_db.add_news(arg1, arg2.replace('\\r', '\r'))
 
+@bot.command()
+async def say_adm(ctx, arg1):
+    # 管理人からしか受け付けない
+    if ctx.author.id != manager:
+        return
+    global channel
+
+    for vc in bot.voice_clients:
+        for txch in vc.guild.text_channels:
+            print(txch.name)
+            if txch.id == channel[vc.guild.id]:
+                await txch.send('[INFO] {}'.format(arg1))
+
 #辞書の操作をするコマンド
 @bot.command()
 async def wbook(ctx, arg1='emp', arg2='emp', arg3='emp'):
@@ -240,9 +249,7 @@ async def on_message(message):
         return
     global voice
     global channel
-    global msger
-    global mess_time
-    global mess_start
+    
     mess_id = message.author.id # メッセージを送った人のユーザID
 
     # ギルドIDがない場合、DMと判断する
@@ -307,7 +314,7 @@ async def on_message(message):
             rawfile = await knockApi(get_msg , user.speaker, str_guild_id)
         # 失敗した場合(ログは吐くようにしたい)
         except:
-            await message.channel.send('ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。')
+            await message.channel.send('{} ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。'.format(message.author.mention))
             return
         
         # 再生処理
