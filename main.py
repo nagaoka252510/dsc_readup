@@ -61,6 +61,7 @@ async def help(ctx):
     embed.add_field(name='{}bye'.format(prefix), value='わいをボイスチャンネルから追い出す時に使うんや。', inline=False)
     embed.add_field(name='{}spk'.format(prefix), value='声を変えるのに使うで。詳しくは、「{}spk help」を見てほしい。'.format(prefix), inline=False)
     embed.add_field(name='{}set_prefix'.format(prefix), value='コマンドプレフィックスを変更するのに使うで。「{}set_prefix ??」みたいにするといいぞ。'.format(prefix), inline=False)
+    embed.add_field(name='{}stop'.format(prefix), value='わいが喋ってるのを黙らせるで。', inline=False)
     embed.add_field(name='{}wbook'.format(prefix), value='読み仮名の登録とかができるで。詳しくは、「{}wbook help」を見て欲しい。'.format(prefix), inline=False)
 
     await ctx.send(embed=embed)
@@ -170,6 +171,7 @@ async def set_prefix(ctx, arg1):
     ctrl_db.set_prefix(guild_id, arg1)
     await ctx.send('prefixを{}に変更したで。'.format(arg1))
 
+# ここから管理者コマンド
 @bot.command()
 async def notify(ctx, arg1, arg2):
     # 管理人からしか受け付けない
@@ -189,6 +191,17 @@ async def say_adm(ctx, arg1):
             print(txch.name)
             if txch.id == channel[vc.guild.id]:
                 await txch.send('[INFO] {}'.format(arg1))
+# ここまで
+
+# 喋太郎の発言を止める
+@bot.command()
+async def stop(ctx):
+    global voice
+    vc = voice[ctx.guild.id]
+    if(vc.is_playing()):
+        vc.stop()
+    else:
+        await ctx.send("なんも言うてへんで")
 
 #辞書の操作をするコマンド
 @bot.command()
@@ -239,7 +252,6 @@ async def wbook(ctx, arg1='emp', arg2='emp', arg3='emp'):
             await ctx.send('使い方が正しくないで。{}wbook helpを見てみ。'.format(prefix))
     else:
         await ctx.send('使い方が正しくないで。{}wbook helpを見てみ。'.format(prefix))
-
 
 
 # メッセージを受信した時の処理
