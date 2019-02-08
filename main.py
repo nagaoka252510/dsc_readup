@@ -188,7 +188,6 @@ async def say_adm(ctx, arg1):
 
     for vc in bot.voice_clients:
         for txch in vc.guild.text_channels:
-            print(txch.name)
             if txch.id == channel[vc.guild.id]:
                 await txch.send('[INFO] {}'.format(arg1))
 # ここまで
@@ -311,10 +310,6 @@ async def on_message(message):
 
     # メッセージを、呼び出されたチャンネルで受信した場合
     if message.channel.id == channel[guild_id]:
-        # 音声ファイルを再生中の場合再生終了まで止まる
-        while (voice[guild_id].is_playing()):
-            # 他の処理をさせて1秒待機
-            await asyncio.sleep(1)
         # 置換文字のリストを取得
         words = ctrl_db.get_dict(str_guild_id)
         # メッセージを、音声ファイルを作成するモジュールへ投げる処理
@@ -329,6 +324,10 @@ async def on_message(message):
             await message.channel.send('{} ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。'.format(message.author.mention))
             return
         
+        # 音声ファイルを再生中の場合再生終了まで止まる
+        while (voice[guild_id].is_playing()):
+            # 他の処理をさせて1秒待機
+            await asyncio.sleep(1)
         # 再生処理
         voice_mess = './cache/{}/{}'.format(str_guild_id, rawfile) # rawファイルのディレクトリ
         voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess, before_options='-f s16be -ar 16k -ac 1')) # エンコードして音声チャンネルで再生
