@@ -226,8 +226,12 @@ async def wbook(ctx, arg1='emp', arg2='emp', arg3='emp'):
         words = ctrl_db.get_dict(str_id)
         embed = discord.Embed(title='辞書一覧')
         embed.add_field(name='番号', value='単語:よみがな', inline=False)
-        for word in words:
-            embed.add_field(name=str(word.id), value='{}:{}'.format(word.word, word.read), inline=False)
+        for i, word in enumerate(words, start=1):
+            if i%15 == 0:
+                await ctx.send(embed=embed)
+                embed = discord.Embed(title=str(word.id), description='{}:{}'.format(word.word, word.read))
+            else:
+                embed.add_field(name=str(word.id), value='{}:{}'.format(word.word, word.read), inline=False)
 
         await ctx.send(embed=embed)
 
