@@ -314,18 +314,40 @@ async def on_message(message):
 
     # メッセージを、呼び出されたチャンネルで受信した場合
     if message.channel.id == channel[guild_id]:
+        # URLを、"URL"へ置換
+        get_msg = re.sub(r'http(s)?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=]*)?', 'URL', message.content)
+        # mention と channel_mentionを名前へ置換
+        mn_list = message.raw_mentions
+        ch_list = message.raw_channel_mentions
+        # IDに対応する名前の辞書を作成
+        mn_dict = {}
+        ch_dict = {}
+        # mentionの、ユーザネームへの置換
+        for ment in mn_list:
+            # 自身へのメンションかどうかで、Keyを変える
+            if ment == mess_id:
+                mn_dict['<@!{}>'.format(str(ment))] = message.guild.get_member(ment).name
+            else:
+                mn_dict['<@{}>'.format(str(ment))] = message.guild.get_member(ment).name
+        # channel_mentionの、チャンネル名への置換
+        for cnls in ch_list:
+            ch_dict['<#{}>'.format(str(cnls))] = message.guild.get_channel(cnls).name
+        # 変換テーブルの作成
+        for me_key in mn_dict.keys():
+            get_msg = get_msg.replace(me_key, mn_dict[me_key], 1)
+        for ch_key in ch_dict.keys():
+            get_msg = get_msg.replace(ch_key, ch_dict[ch_key], 1)
         # 置換文字のリストを取得
         words = ctrl_db.get_dict(str_guild_id)
+        for word in words:
+            get_msg = get_msg.replace(word.word, word.read)
+        get_msg = get_msg.replace('<', '').replace('>', '')
         # メッセージを、音声ファイルを作成するモジュールへ投げる処理
         try :
-            # URLを、"URL"へ置換
-            get_msg = re.sub(r'http(s)?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=]*)?', 'URL', message.content)
-            for word in words:
-                get_msg = get_msg.replace(word.word, word.read)
             rawfile = await knockApi(get_msg , user.speaker, str_guild_id)
         # 失敗した場合(ログは吐くようにしたい)
         except:
-            await message.channel.send('{} ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。'.format(message.author.mention))
+            await message.channel.send('To {} ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。'.format(message.author.name))
             return
         
         # 音声ファイルを再生中の場合再生終了まで止まる
