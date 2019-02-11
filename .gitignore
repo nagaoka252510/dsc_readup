@@ -2,4 +2,5 @@ cache/
 sound/
 __pycache__/
 token.json
+syabetaro.log
 .DS_Store
