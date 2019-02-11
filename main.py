@@ -316,6 +316,9 @@ async def on_message(message):
     if message.channel.id == channel[guild_id]:
         # URLを、"URL"へ置換
         get_msg = re.sub(r'http(s)?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=]*)?', 'URL', message.content)
+        # reactionの置換
+        get_msg = get_msg.replace('<:', '')
+        get_msg = re.sub(r':[0-9]*>', '', get_msg)
         # mention と channel_mentionを名前へ置換
         mn_list = message.raw_mentions
         ch_list = message.raw_channel_mentions
