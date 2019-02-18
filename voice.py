@@ -22,21 +22,6 @@ with open('token.json') as f:
 API_KEY = df['docomo']
 url = "https://api.apigw.smt.docomo.ne.jp/aiTalk/v1/textToSpeech?APIKEY="+API_KEY
  
- 
-# aitalk パラメーター設定
-# ===========================================
- 
-"""
-参考）音声合成 | docomo Developer support
-https://dev.smt.docomo.ne.jp/?p=docs.api.page&api_name=text_to_speech&p_name=api_1#tag01
- 
-    'speaker' : "nozomi"、"seiji"、"akari"、"anzu"、"hiroshi"、"kaho"、"koutarou"、"maki"、"nanako"、"osamu"、"sumire"
-    'pitch' : ベースライン・ピッチ。 基準値:1.0、範囲:0.50～2.00
-    'range' : ピッチ・レンジ。基準値:1.0、範囲:0.00～2.00
-    'rate' : 読み上げる速度。基準値:1.0、範囲:0.50～4.00
-    'volume' : 音量。基準値:1.0、範囲:0.00～2.00
-"""
- 
 async def fetch(session, url, data_fm, headers):
     with async_timeout.timeout(10):
         async with session.post(url, data=data_fm, headers=headers) as response:
@@ -51,14 +36,24 @@ async def knockApi(makemsg, msger, group):
 
     #バイナリデータの一時保存場所
     tmp = "./cache/{}/".format(group)
- 
-    # wavデータの保存場所
-    soundDir = "./sound/{}/".format(group)
 
     if not os.path.isdir(tmp):
         os.makedirs(tmp)
-    if not os.path.isdir(soundDir):
-        os.makedirs(soundDir)
+
+    # aitalk パラメーター設定
+    # ===========================================
+    
+    """
+    参考）音声合成 | docomo Developer support
+    https://dev.smt.docomo.ne.jp/?p=docs.api.page&api_name=text_to_speech&p_name=api_1#tag01
+    
+        'speaker' : "nozomi"、"seiji"、"akari"、"anzu"、"hiroshi"、"kaho"、"koutarou"、"maki"、"nanako"、"osamu"、"sumire"
+        'pitch' : ベースライン・ピッチ。 基準値:1.0、範囲:0.50～2.00
+        'range' : ピッチ・レンジ。基準値:1.0、範囲:0.00～2.00
+        'rate' : 読み上げる速度。基準値:1.0、範囲:0.50～4.00
+        'volume' : 音量。基準値:1.0、範囲:0.00～2.00
+    """
+
     prm = {
         'speaker' : msger,
         'pitch' : '1.2',
@@ -103,24 +98,18 @@ async def knockApi(makemsg, msger, group):
                 'Content-Length' : str(len(xml))
             }
         )
-
-    # print(response.status)
-    # print(response.content_type)
     
     #現在日時を取得
     now = datetime.datetime.now()
-    tstr = datetime.datetime.strftime(now, '%Y%m%d-%H%M%S')
+    tstr = datetime.datetime.strftime(now, '%Y%m%d-%H%M%S%f')
     
     #保存するファイル名
     rawFile = tstr + ".raw"
-    # wavFile = "msg.wav"
 
     #バイナリデータを保存
     fp = open(tmp + rawFile, 'wb')
     fp.write(response)
     fp.close()
-    
-    #print("Save Binary Data : " + tmp + rawFile)
     
     # PCM名を返す
     return rawFile

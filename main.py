@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 import json
@@ -360,7 +361,8 @@ async def on_message(message):
         # 再生処理
         voice_mess = './cache/{}/{}'.format(str_guild_id, rawfile) # rawファイルのディレクトリ
         voice[guild_id].play(discord.FFmpegPCMAudio(voice_mess, before_options='-f s16be -ar 16k -ac 1')) # エンコードして音声チャンネルで再生
-
+        await asyncio.sleep(0.5)
+        os.remove(voice_mess) #rawファイルの削除
 
 def add_guild_db(guild):
     str_id = str(guild.id)
