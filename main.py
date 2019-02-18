@@ -65,6 +65,7 @@ async def help(ctx):
     embed.add_field(name='{}stop'.format(prefix), value='わいが喋ってるのを黙らせるで。', inline=False)
     embed.add_field(name='{}wbook'.format(prefix), value='読み仮名の登録とかができるで。詳しくは、「{}wbook help」を見て欲しい。'.format(prefix), inline=False)
     embed.add_field(name='{}readname'.format(prefix), value='コマンドの後に「on」か「off」をつけることで、名前を読み上げるか切り替えられるで。', inline=False)
+    embed.add_field(name='{}speed'.format(prefix), value='コマンドの後に0.5~4.0の小数をつけることで、読み上げ速度が変わるで。', inline=False)
 
     await ctx.send(embed=embed)
 

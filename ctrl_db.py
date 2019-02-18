@@ -40,7 +40,7 @@ class User(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     speaker = Column(String)
-    speed = Column(Float, default=1.2)
+    speed = Column(Float, default=1)
 
 class Dictionaly(Base):
     __tablename__ = 'dictionaly'
