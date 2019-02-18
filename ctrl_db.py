@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 import psycopg2
 import json
 
@@ -30,6 +30,7 @@ class Guild(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     prefix = Column(String)
+    is_nameread = Column(Boolean, default=False)
     ardnotify = orm.relationship("ArdNotify")
     dictionaly = orm.relationship("Dictionaly")
 
@@ -146,3 +147,17 @@ def del_dict(id, str_id):
 
         session.commit()
         return True
+
+def set_nameread(is_read, guild_id):
+    found_guild = session.query(Guild).filter_by(id=guild_id).one_or_none()
+
+    if isinstance(found_guild, type(None)):
+        return None
+    else:
+        found_guild.is_nameread = is_read
+        session.commit()
+
+def get_nameread(guild_id):
+    found_guild = session.query(Guild).filter_by(id=guild_id).one_or_none()
+
+    return found_guild.is_nameread
