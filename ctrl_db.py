@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey
 import psycopg2
 import json
 
@@ -40,6 +40,7 @@ class User(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     speaker = Column(String)
+    speed = Column(Float, default=1.2)
 
 class Dictionaly(Base):
     __tablename__ = 'dictionaly'
@@ -157,7 +158,11 @@ def set_nameread(is_read, guild_id):
         found_guild.is_nameread = is_read
         session.commit()
 
-def get_nameread(guild_id):
-    found_guild = session.query(Guild).filter_by(id=guild_id).one_or_none()
+def set_readspeed(prm, id):
+    found_user = session.query(User).filter_by(id=id).one_or_none()
 
-    return found_guild.is_nameread
+    if isinstance(found_user, type(None)):
+        return None
+    else:
+        found_user.speed = prm
+        session.commit()

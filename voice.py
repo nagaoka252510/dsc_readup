@@ -32,7 +32,7 @@ async def fetch(session, url, data_fm, headers):
             
             return await response.read()
 
-async def knockApi(makemsg, msger, group):
+async def knockApi(makemsg, msger, speed, group):
 
     #バイナリデータの一時保存場所
     tmp = "./cache/{}/".format(group)
@@ -58,7 +58,7 @@ async def knockApi(makemsg, msger, group):
         'speaker' : msger,
         'pitch' : '1.2',
         'range' : '1.1',
-        'rate' : '1',
+        'rate' : str(speed),
         'volume' : '2'
     }
     # パラメーター受取

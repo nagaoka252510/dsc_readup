@@ -279,6 +279,33 @@ async def readname(ctx, arg1='emp'):
     else:
         await ctx.send('使い方が正しくないで。{}helpを見てみ。'.format(prefix))
 
+@bot.command()
+async def speed(ctx, arg1='emp'):
+    guild_id = ctx.guild.id
+    str_id = str(guild_id)
+    guild_deta = ctrl_db.get_guild(str_id)
+    if isinstance(guild_deta, type(None)):
+        prefix = '?'
+    else:
+        prefix = guild_deta.prefix
+
+    struid = str(ctx.author.id)
+
+    if arg1 == 'emp':
+        await ctx.send('引数が不足してるで。{}helpを見てみ。'.format(prefix))
+        return
+
+    try:
+        speed = float(arg1)
+    except:
+        await ctx.send('使い方が正しくないで。{}helpを見てみ。'.format(prefix))
+        return
+
+    if speed >= 0.5 and speed <= 4.0:
+        ctrl_db.set_readspeed(speed, struid)
+    else:
+        await ctx.send('数値が正しくないで。0.5~4.0を指定してくれな。デフォルトは1.0や。')
+
 # メッセージを受信した時の処理
 @bot.event
 async def on_message(message):
@@ -368,13 +395,13 @@ async def on_message(message):
             get_msg = get_msg.replace(word.word, word.read)
         get_msg = get_msg.replace('<', '').replace('>', '')
         # 読み上げモード確認
-        is_nameread = ctrl_db.get_nameread(str_guild_id)
+        is_nameread = ctrl_db.get_guild(str_guild_id).is_nameread
         # モードによって名前を追加するか検討
         if is_nameread == True:
             get_msg = '{}、'.format(message.author.display_name) + get_msg
         # メッセージを、音声ファイルを作成するモジュールへ投げる処理
         try :
-            rawfile = await knockApi(get_msg , user.speaker, str_guild_id)
+            rawfile = await knockApi(get_msg , user.speaker, user.speed, str_guild_id)
         # 失敗した場合(ログは吐くようにしたい)
         except:
             await message.channel.send('To {} ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。'.format(message.author.name))
