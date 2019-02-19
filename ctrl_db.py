@@ -41,6 +41,7 @@ class User(Base):
     name = Column(String)
     speaker = Column(String)
     speed = Column(Float, default=1)
+    r_range = Column(Float, default=1.1)
 
 class Dictionaly(Base):
     __tablename__ = 'dictionaly'
@@ -165,4 +166,13 @@ def set_readspeed(prm, id):
         return None
     else:
         found_user.speed = prm
+        session.commit()
+
+def set_readrange(prm, id):
+    found_user = session.query(User).filter_by(id=id).one_or_none()
+
+    if isinstance(found_user, type(None)):
+        return None
+    else:
+        found_user.r_range = prm
         session.commit()
