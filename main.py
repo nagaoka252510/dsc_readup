@@ -68,6 +68,7 @@ async def help(ctx):
     embed.add_field(name='{}readname'.format(prefix), value='コマンドの後に「on」か「off」をつけることで、名前を読み上げるか切り替えられるで。', inline=False)
     embed.add_field(name='{}speed'.format(prefix), value='コマンドの後に0.5~4.0の小数をつけることで、読み上げ速度が変わるで。デフォルトは1.0や。', inline=False)
     embed.add_field(name='{}intone'.format(prefix), value='コマンドの後に0.0~2.0の小数をつけることで、抑揚が変わるで。デフォルトは1.1や。', inline=False)
+    embed.add_field(name='{}pitch'.format(prefix), value='コマンドの後に0.0~2.0の小数をつけることで、高さが変わるで。デフォルトは1.2や。', inline=False)
     embed.add_field(name='{}uranai'.format(prefix), value='おみくじが引けるで。結果は日替わりや。', inline=False)
 
     await ctx.send(embed=embed)
@@ -338,6 +339,33 @@ async def intone(ctx, arg1='emp'):
         await ctx.send('数値が正しくないで。0.0~2.0を指定してくれな。デフォルトは1.1や。')
 
 @bot.command()
+async def pitch(ctx, arg1='emp'):
+    guild_id = ctx.guild.id
+    str_id = str(guild_id)
+    guild_deta = ctrl_db.get_guild(str_id)
+    if isinstance(guild_deta, type(None)):
+        prefix = '?'
+    else:
+        prefix = guild_deta.prefix
+
+    struid = str(ctx.author.id)
+
+    if arg1 == 'emp':
+        await ctx.send('引数が不足してるで。{}helpを見てみ。'.format(prefix))
+        return
+
+    try:
+        pitch = float(arg1)
+    except:
+        await ctx.send('使い方が正しくないで。{}helpを見てみ。'.format(prefix))
+        return
+
+    if pitch >= 0.0 and pitch <= 2.0:
+        ctrl_db.set_readpitch(pitch, struid)
+    else:
+        await ctx.send('数値が正しくないで。0.0~2.0を指定してくれな。デフォルトは1.2や。')
+
+@bot.command()
 async def uranai(ctx):
     predic = get_predic(ctx.author.id)
 
@@ -448,7 +476,7 @@ async def on_message(message):
             get_msg = '{}、'.format(message.author.display_name) + get_msg
         # メッセージを、音声ファイルを作成するモジュールへ投げる処理
         try :
-            rawfile = await knockApi(get_msg , user.speaker, user.speed, user.r_range,str_guild_id)
+            rawfile = await knockApi(get_msg , user.speaker, user.speed, user.r_range, user.pitch, str_guild_id)
         # 失敗した場合(ログは吐くようにしたい)
         except:
             await message.channel.send('To {} ちょいとエラー起きたみたいや。少し待ってからメッセージ送ってくれな。'.format(message.author.name))
