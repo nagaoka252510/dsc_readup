@@ -15,15 +15,14 @@ def get_predic(id):
     random.seed(id+datenum)
     
     result = {
-        '運勢':omikuji[random.randrange(5)],
-        '和歌':waka[random.randint(1, 100)]["bodyKanji"],
-        '願望':nariyuki[random.randrange(11)],
-        '健康':nariyuki[random.randrange(11)],
-        '待ち人':kurukonai[random.randrange(6)],
-        '出産':nariyuki[random.randrange(11)],
-        '商売':nariyuki[random.randrange(11)],
+        '運勢':random.choice(omikuji),
+        '和歌':random.choice(waka)["bodyKanji"],
+        '願望':random.choice(nariyuki),
+        '健康':random.choice(nariyuki),
+        '待ち人':random.choice(kurukonai),
+        '出産':random.choice(nariyuki),
+        '商売':random.choice(nariyuki),
         '投稿':'はやめで'
     }
 
     return result
-
