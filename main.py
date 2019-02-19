@@ -10,6 +10,7 @@ import ctrl_db
 from discord.ext import commands
 from pydub import AudioSegment
 from voice import knockApi
+from fortune import get_predic
 
 # ログを出力
 logger = logging.getLogger('discord')
@@ -306,6 +307,22 @@ async def speed(ctx, arg1='emp'):
         ctrl_db.set_readspeed(speed, struid)
     else:
         await ctx.send('数値が正しくないで。0.5~4.0を指定してくれな。デフォルトは1.0や。')
+
+@bot.command()
+async def uranai(ctx):
+    predic = get_predic(ctx.author.id)
+
+    embed = discord.Embed(title='{}のおみくじ'.format(ctx.author.display_name))
+    embed.add_field(name='運勢', value=predic['運勢'], inline=False)
+    embed.add_field(name='和歌', value=predic['和歌'], inline=False)
+    embed.add_field(name='願望', value=predic['願望'], inline=False)
+    embed.add_field(name='健康', value=predic['健康'], inline=False)
+    embed.add_field(name='待ち人', value=predic['待ち人'], inline=False)
+    embed.add_field(name='出産', value=predic['出産'], inline=False)
+    embed.add_field(name='商売', value=predic['商売'], inline=False)
+    embed.add_field(name='投稿', value=predic['投稿'], inline=False)
+
+    await ctx.send(embed=embed)
 
 # メッセージを受信した時の処理
 @bot.event
