@@ -106,7 +106,7 @@ async def summon(ctx):
         for noty in noties:
             await ctx.channel.send(noty)
         if len(noties) != 0:
-            await ctx.channel.send('もし良ければ、製作者にポップコーンでも奢ってあげてください\rhttp://amzn.asia/5fx6FNv')
+            await ctx.channel.send('喋太郎の開発、運用等にご協力をお願いします🙌\rhttps://fantia.jp/gamerkohei ')
     else :
         await ctx.channel.send('あんたボイスチャンネルおらへんやんけ！')
 
