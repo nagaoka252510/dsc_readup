@@ -4,3 +4,5 @@ __pycache__/
 token.json
 .log
 .DS_Store
+Pipfile*
+.vscode/
