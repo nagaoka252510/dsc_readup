@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, Float, Date, ForeignKey
+import datetime
 import psycopg2
 import json
 
@@ -51,6 +52,14 @@ class Dictionaly(Base):
     word = Column(String)
     read = Column(String)
     server_id = Column(String, ForeignKey('guild.id', onupdate='CASCADE', ondelete='CASCADE'))
+
+class CountRequest(Base):
+    __tablename__ = 'countrequest'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    date = Column(Date, default = datetime.date.today())
+    hour = Column(Integer, default = datetime.datetime.now().hour)
+    count = Column(Integer, default = 0)
 
 url = 'postgresql+psycopg2://taro@localhost/taro_dsc'
 engine = create_engine(url)
@@ -186,3 +195,17 @@ def set_readpitch(prm, id):
     else:
         found_user.pitch = prm
         session.commit()
+
+def set_reqcount(date, time):
+    found_rec = session.query(CountRequest).filter_by(date = date, hour = time).one_or_none()
+
+    if isinstance(found_rec, type(None)):
+        newct = CountRequest()
+
+        session.add(newct)
+        session.commit()
+
+        found_rec = session.query(CountRequest).filter_by(date = date, hour = time).one()
+    
+    found_rec.count += 1
+    session.commit()

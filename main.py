@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 import sys
@@ -106,7 +107,7 @@ async def summon(ctx):
         for noty in noties:
             await ctx.channel.send(noty)
         if len(noties) != 0:
-            await ctx.channel.send('喋太郎の開発、運用等にご協力をお願いします🙌\rhttps://fantia.jp/gamerkohei ')
+            await ctx.channel.send('喋太郎に何かあれば、だーやまんのお題箱( https://odaibako.net/u/gamerkohei )までお願いします。\r喋太郎の開発、運用等にご協力をお願いします🙌\rhttps://fantia.jp/gamerkohei ')
     else :
         await ctx.channel.send('あんたボイスチャンネルおらへんやんけ！')
 
@@ -404,7 +405,7 @@ async def on_message(message):
                 await message.channel.send('コマンド操作をしてくれ')
                 return
         else:
-            await message.channel.send('喋太郎に何かあれば、だーやまんのお題箱(https://odaibako.net/u/gamerkohei )までお願いします。')
+            await message.channel.send('喋太郎に何かあれば、だーやまんのお題箱( https://odaibako.net/u/gamerkohei )までお願いします。')
             return
 
     guild_id = message.guild.id # サーバID
@@ -474,6 +475,8 @@ async def on_message(message):
         # モードによって名前を追加するか検討
         if is_nameread == True:
             get_msg = '{}、'.format(message.author.display_name) + get_msg
+        #リクエスト回数のカウント
+        ctrl_db.set_reqcount(datetime.date.today(), datetime.datetime.now().hour)
         # メッセージを、音声ファイルを作成するモジュールへ投げる処理
         try :
             rawfile = await knockApi(get_msg , user.speaker, user.speed, user.r_range, user.pitch, str_guild_id)
