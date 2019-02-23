@@ -57,8 +57,8 @@ class CountRequest(Base):
     __tablename__ = 'countrequest'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    date = Column(Date, default = datetime.date.today())
-    hour = Column(Integer, default = datetime.datetime.now().hour)
+    date = Column(Date)
+    hour = Column(Integer)
     count = Column(Integer, default = 0)
 
 url = 'postgresql+psycopg2://taro@localhost/taro_dsc'
@@ -200,7 +200,7 @@ def set_reqcount(date, time):
     found_rec = session.query(CountRequest).filter_by(date = date, hour = time).one_or_none()
 
     if isinstance(found_rec, type(None)):
-        newct = CountRequest()
+        newct = CountRequest(date = date, hour = time)
 
         session.add(newct)
         session.commit()
