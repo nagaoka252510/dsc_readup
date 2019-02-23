@@ -3,5 +3,5 @@
     "bot":"BOT TOKEN",
     "manager_id":"BOT MANAGER DISCORD ID",
     "db_user":"taro",
-    "db_pass":"password"
+    "db_name":"taro_dsc"
 }
