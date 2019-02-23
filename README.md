@@ -8,7 +8,7 @@ Overview
 テキストチャンネルに入力されたテキストを元に合成音声APIを用いて音声ファイルを生成し、ボイスチャンネルで再生するBotです。読み上げ音声はVOICEROIDの結月ゆかり、弦巻マキ、月読アイ、水奈瀬コウと同じものを利用できます。
 
 ## Demo
-<iframe width="312" height="176" src="https://ext.nicovideo.jp/thumb/sm34363918" scrolling="no" style="border:solid 1px #ccc;" frameborder="0"><a href="https://www.nicovideo.jp/watch/sm34363918">ボイロにDiscordのチャットを読み上げてもら(いたか)った</a></iframe>  
+https://www.nicovideo.jp/watch/sm34363918
 
 ただし、この動画の喋太郎はバージョンが古いです。
 
@@ -41,14 +41,14 @@ http://nonbiriyanonikki.hatenablog.com/entry/2019/02/09/122844
 $ pip install -r requrire.txt
 ```  
 で必要なライブラリをインストールしてください。  
-次に、postgresqlで`taro_dsc`という名前のデータベースを作成しておきます。  
+次に、postgresqlでデータベースを作成しておきます。  
 次に、`token.json.example`を`token.json`にリネームします。内容を以下で指定したように適宜書き換えてください。
 ```
 "docomo":"docomo Deveroper TOKEN", 
 "bot":"BOT TOKEN",
 "manager_id":"BOT MANAGER DISCORD ID", #Bot管理人のDiscord ID
 "db_user":"taro", # データベースのユーザ
-"db_pass":"password" # データベースのログインパスワード
+"db_name":"taro_dsc" # データベースの名前
 ```
 設定が終わったら、
 ```
