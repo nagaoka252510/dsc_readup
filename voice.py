@@ -1,4 +1,4 @@
-# ソースはこちらから引用 http://blog.cgfm.jp/garyu/archives/3396
+# ソースはこちらから引用・改修 http://blog.cgfm.jp/garyu/archives/3396
 import json
 import os
 import sys
