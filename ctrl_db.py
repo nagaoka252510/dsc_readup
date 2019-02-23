@@ -5,6 +5,10 @@ import datetime
 import psycopg2
 import json
 
+# dbのユーザとか読み込み
+with open('token.json') as f:
+    df = json.load(f)
+
 Base = declarative_base()
 
 class News(Base):
@@ -61,7 +65,7 @@ class CountRequest(Base):
     hour = Column(Integer)
     count = Column(Integer, default = 0)
 
-url = 'postgresql+psycopg2://taro@localhost/taro_dsc'
+url = 'postgresql+psycopg2://{}@localhost/{}'.format(df['db_user'], df['db_name'])
 engine = create_engine(url)
 
 def main():
